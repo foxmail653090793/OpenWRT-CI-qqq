@@ -5,6 +5,20 @@ CONFIG_PACKAGE_luci-app-mosdns=y
 CONFIG_PACKAGE_luci-app-autoreboot=y
 CONFIG_PACKAGE_luci-app-upnp=y
 CONFIG_PACKAGE_luci-theme-material=y
+CONFIG_PACKAGE_luci-app-turboacc=y
+#启用 TurboACC（IPQ807x 专用：开 NSS、关 SFE）
+CONFIG_PACKAGE_luci-app-turboacc=y
+CONFIG_PACKAGE_luci-i18n-turboacc-zh-cn=y
+# 基础依赖-加速相关
+CONFIG_PACKAGE_kmod-nft-offload=y
+CONFIG_PACKAGE_kmod-tcp-bpf=y
+CONFIG_PACKAGE_kmod-tcp-bbr=y
+CONFIG_PACKAGE_nft-fullcone=y
+# IPQ807x 专用：禁用 SFE、启用 NSS 加速
+CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_SFE=n
+CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_SHORTCUT_FE=n
+CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_OFFLOADING=y
+# Lucky 配置
 CONFIG_PACKAGE_lucky=y
 CONFIG_PACKAGE_luci-app-lucky=y
 CONFIG_PACKAGE_luci-i18n-lucky-zh-cn=y
