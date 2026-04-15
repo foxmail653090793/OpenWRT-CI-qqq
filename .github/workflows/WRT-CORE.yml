@@ -147,11 +147,13 @@ jobs:
 
             echo "caches cleanup done!"
           fi
-      - name: Add Lucky feed
+          
+      - name: Add Lucky (latest v2.27.2)
         run: |
           cd ./wrt
+          rm -rf package/luci-app-lucky
           echo "src-git lucky https://github.com/gdy666/luci-app-lucky.git" >> feeds.conf.default
-
+          
       - name: Update Feeds
         run: |
           cd ./wrt/
