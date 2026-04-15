@@ -147,6 +147,10 @@ jobs:
 
             echo "caches cleanup done!"
           fi
+      - name: Add Lucky feed
+        run: |
+          cd ./wrt
+          echo "src-git lucky https://github.com/gdy666/luci-app-lucky.git" >> feeds.conf.default
 
       - name: Update Feeds
         run: |
@@ -161,6 +165,12 @@ jobs:
 
           $GITHUB_WORKSPACE/Scripts/Packages.sh
           $GITHUB_WORKSPACE/Scripts/Handles.sh
+          
+          # 拉取 TurboACC 源码（支持 Firewall4、适配 ImmortalWRT）
+          git clone --depth=1 https://github.com/chenmozhijin/turboacc package/luci-app-turboacc
+          # 修复权限与换行
+          find package/luci-app-turboacc -name "*.sh" -o -name "Makefile" | xargs dos2unix
+          find package/luci-app-turboacc -name "*.sh" | xargs chmod +x
 
       - name: Custom Settings
         run: |
@@ -172,6 +182,26 @@ jobs:
             cat $GITHUB_WORKSPACE/Config/$WRT_CONFIG.txt $GITHUB_WORKSPACE/Config/GENERAL.txt >> .config
           fi
 
+           # 👇 只加这一段，启用 TurboACC（IPQ807x 专用：开 NSS、关 SFE）
+          cat >> .config <<EOF
+          CONFIG_PACKAGE_luci-app-turboacc=y
+          CONFIG_PACKAGE_luci-i18n-turboacc-zh-cn=y
+          # 基础依赖-加速相关
+          CONFIG_PACKAGE_kmod-nft-offload=y
+          CONFIG_PACKAGE_kmod-tcp-bpf=y
+          CONFIG_PACKAGE_kmod-tcp-bbr=y
+          CONFIG_PACKAGE_nft-fullcone=y
+          # IPQ807x 专用：禁用 SFE、启用 NSS 加速
+          CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_SFE=n
+          CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_SHORTCUT_FE=n
+          CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_OFFLOADING=y
+          # Lucky 配置
+          CONFIG_PACKAGE_lucky=y
+          CONFIG_PACKAGE_luci-app-lucky=y
+          CONFIG_PACKAGE_luci-i18n-lucky-zh-cn=y
+
+          EOF
+          
           $GITHUB_WORKSPACE/Scripts/Settings.sh
 
           make defconfig -j$(nproc) && make clean -j$(nproc)
@@ -232,11 +262,11 @@ jobs:
           tag_name: ${{env.WRT_CONFIG}}-${{env.WRT_INFO}}-${{env.WRT_BRANCH}}-${{env.WRT_DATE}}
           files: ./wrt/upload/*.*
           body: |
-            这是个平台固件包，内含多个设备！
-            请注意选择你需要的设备固件！
-            不要问，刷就完事了！
+            这是个FORK自VIKINGYFY大佬的自用项目，仅支持红米AX6!
+            
+            固件可以随便下，但刷坏概不负责
 
-            全系带开源硬件加速，别问了！
+            带开源硬件加速和Turbo ACC！
 
             源码：${{env.WRT_REPO}}
             分支：${{env.WRT_BRANCH}}
