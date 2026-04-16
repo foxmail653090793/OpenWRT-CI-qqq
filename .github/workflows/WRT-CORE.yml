@@ -164,12 +164,6 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-          # 修复 luci 显示
-          find feeds -name "*nft-qos*" -type f -name "*.uc" | \
-          xargs sed -i 's/vpn/services/g' 2>/dev/null || true
-
-          find feeds -name "*nft-qos*" -type f -name "*.uc" | \
-          xargs sed -i 's/network/services/g' 2>/dev/null || true
       - name: Custom Packages
         run: |
           cd ./wrt/package/
@@ -193,11 +187,6 @@ jobs:
             cat $GITHUB_WORKSPACE/Config/$WRT_CONFIG.txt $GITHUB_WORKSPACE/Config/GENERAL.txt >> .config
           fi
           
-          cat >> .config <<EOF
-          CONFIG_PACKAGE_nft-qos=y
-          CONFIG_PACKAGE_luci-app-nft-qos=y
-          CONFIG_PACKAGE_luci-i18n-nft-qos-zh-cn=y
-          EOF
 
 
           
